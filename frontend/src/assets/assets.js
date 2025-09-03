@@ -40,6 +40,8 @@ import car_image1 from "./car_image1.png"
 import car_image2 from "./car_image2.png"
 import car_image3 from "./car_image3.png"
 import car_image4 from "./car_image4.png"
+import github from "./github.svg"
+import linkedin from "./linkedin.svg"
 
 // export const cityList = ['New York', 'Los Angeles', 'Houston', 'Chicago']
 export const cityList = ['Mumbai', 'New Delhi', 'Jaipur', 'Bengaluru']
@@ -86,7 +88,9 @@ export const assets = {
     user_profile,
     car_image2,
     car_image3,
-    car_image4
+    car_image4,
+    github,
+    linkedin
 }
 
 export const menuLinks = [
