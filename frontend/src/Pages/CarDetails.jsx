@@ -190,7 +190,7 @@ function CarDetails() {
                   <img
                     src={assets.close_icon}
                     alt="Close"
-                    className="h-6 w-6"
+                    className="h-6 w-6 cursor-pointer"
                   />
                 </button>
               </div>
@@ -305,13 +305,13 @@ function CarDetails() {
                   <button
                     type="button"
                     onClick={() => setShowBookingForm(false)}
-                    className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                    className="flex-1 bg-gray-200 text-gray-800 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary-dark transition-colors"
+                    className="flex-1 bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary-dull transition-colors cursor-pointer"
                   >
                     Confirm Booking
                   </button>

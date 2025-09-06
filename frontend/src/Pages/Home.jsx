@@ -14,7 +14,6 @@ function Home() {
         <Banner/>
         <Testimonial/>
         <Newsletter/>
-        <Footer />
         </>
     )
 }
