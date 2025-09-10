@@ -167,7 +167,7 @@ function CarDetails() {
             <div className="pt-4">
               <button
                 onClick={() => setShowBookingForm(true)}
-                className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+                className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 cursor-pointer hover:bg-primary-dull"
               >
                 Book Now
               </button>
