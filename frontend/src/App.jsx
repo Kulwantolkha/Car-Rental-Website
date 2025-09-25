@@ -12,12 +12,14 @@ import Layout from './Pages/owner/Layout'
 import AddCar from './Pages/owner/Addcar'
 import ManageCar from './Pages/owner/ManageCar'
 import ManageBookings from './Pages/owner/ManageBookings'
+import Login from './components/owner/Login'
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
   const isOwnerPath = useLocation().pathname.startsWith("/owner");
   return (
     <>
+      {showLogin && <Login setShowLogin={setShowLogin}/>}
       {!isOwnerPath && <Navbar setShowLogin={setShowLogin}/>}
       <Routes>
         <Route path='/' element={<Home/>}/>
