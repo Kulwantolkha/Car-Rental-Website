@@ -4,7 +4,7 @@ import cors from "cors";
 import connectDB from "./configs/db.js"
 import userRouter from "./routes/UserRoutes.js"
 import ownerRouter from "./routes/Owner.routes.js"
-
+import bookingRouter from "./routes/Booking.routes.js"
 const app = express();
 
 //connect database
@@ -29,6 +29,7 @@ app.use(express.json());
 app.get("/", (req,res)=>    res.send("Server is running."));
 app.use("/api/user", userRouter);
 app.use("/api/owner", ownerRouter);
+app.use("/api/booking",bookingRouter);
 
 
 const PORT = process.env.PORT || 3000;

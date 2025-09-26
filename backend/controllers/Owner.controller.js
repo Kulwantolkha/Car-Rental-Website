@@ -2,6 +2,7 @@ import User from "../models/User.model.js"
 import fs from "fs";
 import Car from "../models/Car.model.js"
 import imagekit from '../configs/ImageKit.js'
+import Booking from "../models/Booking.model.js"
 
 //to change role of user
 const Owner = async (req, res) => {
@@ -68,7 +69,7 @@ export const addCar = async (req, res) => {
                 { format: 'webp' }
             ]
         });
-        
+        const image= optimizedImageUrl;
 
         // Create car in database
         const carData = {
@@ -88,12 +89,12 @@ export const addCar = async (req, res) => {
             data: newCar
         });
         
-        console.log("🚗 ----- ADD CAR FUNCTION COMPLETED -----");
+        console.log(" ----- ADD CAR FUNCTION COMPLETED -----");
         
     } catch (error) {
         console.log(" ----- ADD CAR FUNCTION ERROR -----");
-        console.error("❌ Error:", error.message);
-        console.error("❌ Stack:", error.stack);
+        console.error(" Error:", error.message);
+        console.error(" Stack:", error.stack);
         
         res.json({
             success: false, 
@@ -102,5 +103,134 @@ export const addCar = async (req, res) => {
     }
 };
 
+//API to list owner cars
+export const getOwnercars = async(req,res) => {
+    try {
+        const {_id} = req.user;
+        const cars = await Car.find({owner: _id});
+        res.json({success: true, cars});
+    }
+    catch (error) {
+        console.log(error.message);
+        res.json({success: false, message: error.message});
+    }
+}
+
+//API to Toggle Car Availability
+export const toggleCarAvailability = async (req, res) => {
+    try {
+        const {_id} = req.user;
+        const {carId} = req.body;
+        const car = await Car.findById(carId);
+
+        if(car.owner?.toString() !== _id.toString()) {
+            return res.json({success:false,message: "Unauthorized"})
+        }
+
+        car.isAvailable = !car.isAvailable;
+        await car.save();
+        
+        res.json({success:true, message: "Availability Toggled"})
+    }
+    catch(error) {
+        console.log(error.message);
+        res.json({success: false, message: `Availability Not Toggled ${error.message}`});
+    }
+}
+
+//API to delete car
+export const deleteCar = async (req, res) => {
+    try {
+        const {_id} = req.user;
+        const {carId} = req.body;
+        const car = await Car.findById(carId);
+
+        if(car.owner?.toString() !== _id.toString()) {
+            return res.json({success:false,message: "Unauthorized"})
+        }
+
+        car.owner = null;
+        car.isAvailable = false;
+        await car.save();
+        
+        res.json({success:true, message: "Car removed"})
+    }
+    catch(error) {
+        console.log(error.message);
+        res.json({success: false, message: `Couldn't remove car, ${error.message}`});
+    }
+}
+
+export const getDashboardData = async (req,res) => {
+    try {
+        const {_id, role} = req.user;
+        if(role!="owner") {
+            return res.json({success: false, message: "Unauthorized to get dashboard"})
+        }
+
+        const cars = await Car.find({owner: _id});
+        const bookings = (await Booking.find({owner: _id}).populate('car')).toSorted({createdAt: -1});
+
+        const pendingBookings = await Booking.find({owner: _id, status: "pending"});
+        const completedBookings = await Booking.find({owner: _id, status: "confirmed"});
+
+        //Calculate monthlyRevenue from bookings where status is confirmed
+
+        const monthlRevenue = bookings.slice().filter(booking => booking.status==="confirmed").reduce((acc,booking)=>acc+booking.price,0)
+
+        const dashboardData = {
+            totalCars: cars.length,
+            totalBooking: bookings.length,
+            pendingBookings: pendingBookings.length,
+            completedBookings: completedBookings.length,
+            recentBookings: bookings.slice(0,3),
+            monthlyRevenue
+        }
+
+        res.json({success:true, dashboardData});
+    }
+    catch (error) {
+        console.log(error.message);
+        res.json({success: false, message: `Couldn't fetch Dashboard, ${error.message}`});
+    }
+}
 
 export default Owner;
+
+//API to update user Image
+
+export const updateUserImage = async (req,res) => {
+    try {
+        const {_id} = req.user;
+
+        const imageFile = req.file;
+
+        // Upload image to imagekit
+        const fileBuffer = fs.readFileSync(imageFile.path);
+        const base64File = fileBuffer.toString('base64');
+        const response = await imagekit.upload({
+            file: base64File,
+            fileName: imageFile.originalname,
+            folder: '/users'
+        });
+
+        // Generate optimized image URL
+        const optimizedImageUrl = imagekit.url({
+            path: response.filePath,
+            transformation: [
+                { width: '1280' },
+                { quality: 'auto' },
+                { format: 'webp' }
+            ]
+        });
+        const image= optimizedImageUrl;
+
+        await User.findByIdAndUpdate(_id, {image});
+        res.json({success:true, message: "Image Updated"})
+    }
+    catch (error) {
+        console.log(`Couldn't update user imgae ${error.message}`)
+        res.json({success:false, message: `Couldn't update user imgae ${error.message}`});
+
+    }
+}

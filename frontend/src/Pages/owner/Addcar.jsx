@@ -26,7 +26,7 @@ const AddCar = () => {
           subTitle="Fill in details to list a new car for booking, including pricing, availibility, and car specification."
         />
         <form
-          obSubmit={onSubmitHandler}
+          onSubmit={onSubmitHandler}
           className="flex flex-col gap-5 text-gray-500 text-sm mt-6 max-w-xl"
         >
           <div className="flex items-center gap-2 w-full">
