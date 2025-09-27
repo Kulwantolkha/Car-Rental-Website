@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import Title from "../../components/owner/Title";
 import { assets } from "../../assets/assets";
+import {useAppContext} from '../../context/AppContext.jsx';
+import {toast} from 'react-hot-toast';
 
 const AddCar = () => {
+  const {axios, currency} = useAppContext();
+
   const [image, setImage] = useState(null);
   const [car, setCar] = useState({
     brand: "",
@@ -15,8 +19,42 @@ const AddCar = () => {
     location: "",
     description: "",
   });
-  const onSubmitHandler = (e) => {
+
+  const [isLoading, setIsLoading] = useState(false);
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
+    if(isLoading) return null;
+    setIsLoading(true);
+    try{
+      const formData = new FormData();
+      formData.append('image', image);
+      formData.append('carData', JSON.stringify(car));
+      const {data} = await axios.post('/api/owner/add-car', formData);
+      if(data.success) {
+        toast.success(data.success);
+        setImage(null);
+        setCar({
+          brand: "",
+          model: "",
+          year: "",
+          pricePerDay: 0,
+          category: "",
+          fuel_type: "",
+          seating_capacity: 0,
+          location: "",
+          description: "",
+        })
+        toast.success('Car Added');
+      }
+      else {
+        toast.error(data.message);
+      }
+    }
+    catch(error) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
   return (
     <>
@@ -86,14 +124,14 @@ const AddCar = () => {
               />
             </div>
             <div className="flex flex-col w-full">
-              <label>Daily Price ({import.meta.env.VITE_CURRENCY})</label>
+              <label>Daily Price ({currency})</label>
               <input
                 type="number"
                 placeholder="eg. 1000"
                 required
                 className="px-3 py-2 mt-1 border border-borderColor rounded-md outline-none"
                 value={car.pricePerDay}
-                onChange={(e) => setCar({ ...car, year: e.target.value })}
+                onChange={(e) => setCar({ ...car, pricePerDay: e.target.value })}
               />
             </div>
             <div className="flex flex-col w-full">
@@ -184,7 +222,7 @@ const AddCar = () => {
           </div>
           <button className="flex items-center gap-2 px-4 py-2.5 mt-4 bg-primary text-white rounded-md font-medium w-max cursor-pointer">
             <img src={assets.tick_icon} />
-            List Your Car
+            {isLoading ? 'Listing...' : 'List Your Car'}
           </button>
         </form>
       </div>
