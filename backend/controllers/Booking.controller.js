@@ -8,7 +8,7 @@ const checkAvailability = async (car, pickupDate, returnDate) => {
         pickupDate: {$lte: returnDate},
         returnDate: {$gte: pickupDate}
     })
-    return bookings.length === 0; 
+    return bookings.length === 0;
 }
 
 //API to check Availability of Cars for the given date and location
